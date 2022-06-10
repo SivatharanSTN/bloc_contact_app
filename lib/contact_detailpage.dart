@@ -1,17 +1,25 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:contactapp/contact_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class ContactDetail extends StatefulWidget {
-  const ContactDetail({Key? key}) : super(key: key);
+  final ContactModel? contact;
+  const ContactDetail({Key? key, required this.contact}) : super(key: key);
 
   @override
   State<ContactDetail> createState() => _MyWidgetState();
 }
 
 class _MyWidgetState extends State<ContactDetail> {
+  @override
+  // void initState() {
+  //   super.initState();
+  //   Service().getData();
+  // }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -22,20 +30,22 @@ class _MyWidgetState extends State<ContactDetail> {
         decoration: const BoxDecoration(
           color: Color(0xffFFFFFF),
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            headerPart(context: context),
-            Container(
-              margin: const EdgeInsets.symmetric(vertical: 4),
-              child: const Divider(
-                color: Color.fromARGB(88, 0, 0, 0),
+        child: Expanded(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              headerPart(context: context),
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 4),
+                child: const Divider(
+                  color: Color.fromARGB(88, 0, 0, 0),
+                ),
               ),
-            ),
-            descriptionArea(context: context),
-            contactDetailArea(context: context),
-            btnArea(context: context)
-          ],
+              descriptionArea(context: context),
+              contactDetailArea(context: context),
+              btnArea(context: context)
+            ],
+          ),
         ),
       ),
     );
@@ -61,8 +71,7 @@ class _MyWidgetState extends State<ContactDetail> {
                   height: 70,
                   width: 70,
                   fit: BoxFit.cover,
-                  imageUrl:
-                      "https://expertphotography.b-cdn.net/wp-content/uploads/2020/08/social-media-profile-photos-3.jpg",
+                  imageUrl: widget.contact?.avatar ?? "",
                   progressIndicatorBuilder: (context, url, downloadProgress) =>
                       CircularProgressIndicator(
                           value: downloadProgress.progress),
@@ -70,7 +79,7 @@ class _MyWidgetState extends State<ContactDetail> {
                 ),
               ),
               Text(
-                "Alex Smith",
+                widget.contact?.name ?? "",
                 style: GoogleFonts.openSans(
                   fontStyle: FontStyle.normal,
                   fontWeight: FontWeight.bold,
@@ -78,13 +87,16 @@ class _MyWidgetState extends State<ContactDetail> {
                   color: const Color.fromARGB(216, 49, 49, 49),
                 ),
               ),
-              Text(
-                "CEO in Monterrey, MX",
-                style: GoogleFonts.openSans(
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 21,
-                  color: const Color.fromARGB(125, 43, 43, 43),
+              Expanded(
+                child: Text(
+                  widget.contact?.job ?? "",
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.openSans(
+                    fontStyle: FontStyle.normal,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 21,
+                    color: const Color.fromARGB(125, 43, 43, 43),
+                  ),
                 ),
               )
             ],
@@ -141,7 +153,7 @@ class _MyWidgetState extends State<ContactDetail> {
                   ),
                 ),
                 Text(
-                  "Intoduce Alex to partner",
+                  "Intoduce to partner",
                   style: GoogleFonts.openSans(
                     fontStyle: FontStyle.normal,
                     fontWeight: FontWeight.w700,
@@ -159,15 +171,17 @@ class _MyWidgetState extends State<ContactDetail> {
             decoration: const BoxDecoration(
               color: Color(0xffFFFFFF),
             ),
-            child: Text(
-              "I've met Alex at an event in Monterrey. He is one of the most influential businessman in the region. I would like to introduce him to my trade partner i EI Pase.",
-              style: GoogleFonts.openSans(
-                fontStyle: FontStyle.normal,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-                color: const Color.fromARGB(134, 32, 32, 32),
+            child: Center(
+              child: Text(
+                widget.contact?.description ?? "",
+                style: GoogleFonts.openSans(
+                  fontStyle: FontStyle.normal,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: const Color.fromARGB(134, 32, 32, 32),
+                ),
+                textAlign: TextAlign.justify,
               ),
-              textAlign: TextAlign.justify,
             ),
           )
         ],
@@ -182,11 +196,15 @@ class _MyWidgetState extends State<ContactDetail> {
       child: Column(
         children: [
           cardDesign(
-              context: context, img: "phone", content: "+52 55 1234 5678"),
+              context: context,
+              img: "phone",
+              content: widget.contact?.phone ?? ""),
           cardDesign(
               context: context, img: "home", content: "+1 (555) 555-1234"),
           cardDesign(
-              context: context, img: "mail", content: "alexsmith@gmail.com"),
+              context: context,
+              img: "mail",
+              content: widget.contact?.email ?? ""),
           cardDesign(
               context: context, img: "instagram", content: "@alexmonterrey"),
         ],
@@ -198,46 +216,51 @@ class _MyWidgetState extends State<ContactDetail> {
       {required BuildContext context,
       required String img,
       required String content}) {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 5),
-      padding: const EdgeInsets.all(5),
-      height: 60,
-      width: MediaQuery.of(context).size.width,
-      decoration: const BoxDecoration(
-        color: Color(0xffFFFFFF),
-      ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(40),
-            child: Container(
-              height: 40,
-              width: 40,
-              decoration: const BoxDecoration(
-                color: Color(0xffF5F9FC),
-              ),
-              child: Center(
-                child: SvgPicture.asset(
-                  "assets/svg/$img.svg",
-                  height: 20,
-                  color: const Color(0xff4287F6),
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 5),
+        padding: const EdgeInsets.all(5),
+        height: 60,
+        width: MediaQuery.of(context).size.width,
+        decoration: const BoxDecoration(
+          color: Color(0xffFFFFFF),
+        ),
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(40),
+              child: Container(
+                height: 40,
+                width: 40,
+                decoration: const BoxDecoration(
+                  color: Color(0xffF5F9FC),
+                ),
+                child: Center(
+                  child: SvgPicture.asset(
+                    "assets/svg/$img.svg",
+                    height: 20,
+                    color: const Color(0xff4287F6),
+                  ),
                 ),
               ),
             ),
-          ),
-          const SizedBox(
-            width: 20,
-          ),
-          Text(
-            content,
-            style: GoogleFonts.openSans(
-              fontStyle: FontStyle.normal,
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
-              color: const Color.fromARGB(199, 43, 43, 43),
+            const SizedBox(
+              width: 20,
             ),
-          )
-        ],
+            Expanded(
+              child: Text(
+                content,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.openSans(
+                  fontStyle: FontStyle.normal,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                  color: const Color.fromARGB(199, 43, 43, 43),
+                ),
+              ),
+            )
+          ],
+        ),
       ),
     );
   }

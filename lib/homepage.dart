@@ -1,6 +1,8 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:contactapp/contact_detailpage.dart';
 import 'package:contactapp/contact_form.dart';
+import 'package:contactapp/contact_model.dart';
+import 'package:contactapp/service.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,59 +32,72 @@ class _MyWidgetState extends State<HomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Container(
-          height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
-          padding: const EdgeInsets.only(top: 25, right: 25, left: 25),
-          decoration: const BoxDecoration(color: Color(0xffFFFFFF)),
-          child: Column(
-            children: [
-              componentOne(context: context),
-              componentTwo(context: context),
-              componentThree(context: context),
-              // cardDesign(context: context),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: 20,
-                  itemBuilder: (BuildContext context, int index) {
-                    return cardDesign(context: context, indexNum: index);
-                  },
+          body: FutureBuilder<List<ContactModel>?>(
+            future: Service().getData(),
+            builder: (context, data) {
+              return Container(
+                height: MediaQuery.of(context).size.height,
+                width: MediaQuery.of(context).size.width,
+                padding: const EdgeInsets.only(top: 25, right: 25, left: 25),
+                decoration: const BoxDecoration(color: Color(0xffFFFFFF)),
+                child: Column(
+                  children: [
+                    componentOne(context: context),
+                    componentTwo(context: context),
+                    componentThree(context: context),
+                    // cardDesign(context: context),
+                    Expanded(
+                      child: ListView.builder(
+                        itemCount: data.data?.length ?? 0,
+                        itemBuilder: (BuildContext context, int index) {
+                          return cardDesign(
+                              context: context,
+                              indexNum: index,
+                              // name: data.data?[index].name ?? "",
+                              // avatar: data.data?[index].avatar ?? "",
+                              // position: data.data?[index].job ?? "",
+                              // city: data.data?[index].city ?? "",
+                              // country: data.data?[index].country ?? "",
+                              contact: data.data?[index]);
+                        },
+                      ),
+                    )
+                  ],
                 ),
-              )
-            ],
+              );
+            },
           ),
-        ),
-        // floatingActionButton: FloatingActionButton(
-        //   onPressed: () {},
-        //   child: const Icon(Icons.add),
-        // ),
 
-        floatingActionButton: Stack(
-          children: [
-            const SizedBox(
-              height: 80,
-              width: 80,
-            ),
-            SizedBox(
-              height: 65.0,
-              width: 65.0,
-              child: FittedBox(
-                child: FloatingActionButton(
-                  backgroundColor: const Color(0xff4287F6),
-                  onPressed: () {
-                    showModalBottomSheet(
-                      isScrollControlled: true,
-                      context: context,
-                      builder: (context) => const ContactForm(),
-                    );
-                  },
-                  child: const Icon(Icons.add),
+          // floatingActionButton:
+          // FloatingActionButton(
+          //   onPressed: () {},
+          //   child: const Icon(Icons.add),
+          // );
+          floatingActionButton: Stack(
+            children: [
+              const SizedBox(
+                height: 80,
+                width: 80,
+              ),
+              SizedBox(
+                height: 65.0,
+                width: 65.0,
+                child: FittedBox(
+                  child: FloatingActionButton(
+                    backgroundColor: const Color(0xff4287F6),
+                    onPressed: () {
+                      showModalBottomSheet(
+                        isScrollControlled: true,
+                        context: context,
+                        builder: (context) => const ContactForm(),
+                      );
+                    },
+                    child: const Icon(Icons.add),
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ),
+            ],
+          )),
     );
   }
 
@@ -244,7 +259,16 @@ class _MyWidgetState extends State<HomePage> {
     );
   }
 
-  Widget cardDesign({required BuildContext context, required indexNum}) {
+  Widget cardDesign({
+    required BuildContext context,
+    required indexNum,
+    // required String name,
+    // required String avatar,
+    // required String position,
+    // required String city,
+    // required String country,
+    ContactModel? contact,
+  }) {
     return InkWell(
       onTap: () {
         setState(() {
@@ -255,12 +279,14 @@ class _MyWidgetState extends State<HomePage> {
         showModalBottomSheet(
           isScrollControlled: true,
           context: context,
-          builder: (context) => const ContactDetail(),
+          builder: (context) => ContactDetail(
+            contact: contact,
+          ),
         );
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 10),
-        margin: const EdgeInsets.symmetric(horizontal: 5),
+        margin: const EdgeInsets.symmetric(horizontal: 0),
         height: 90,
         width: MediaQuery.of(context).size.width,
         decoration: const BoxDecoration(
@@ -285,8 +311,7 @@ class _MyWidgetState extends State<HomePage> {
                         height: 55,
                         width: 55,
                         fit: BoxFit.cover,
-                        imageUrl:
-                            "https://images.unsplash.com/photo-1531427186611-ecfd6d936c79?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cHJvZmlsZXxlbnwwfHwwfHw%3D&w=1000&q=80",
+                        imageUrl: contact?.avatar ?? "",
                         progressIndicatorBuilder:
                             (context, url, downloadProgress) =>
                                 CircularProgressIndicator(
@@ -312,7 +337,7 @@ class _MyWidgetState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Alex Smith",
+                    contact?.name ?? "",
                     style: GoogleFonts.roboto(
                       fontStyle: FontStyle.normal,
                       fontWeight: FontWeight.w700,
@@ -321,11 +346,11 @@ class _MyWidgetState extends State<HomePage> {
                     ),
                   ),
                   Text(
-                    "CEO in Manterrey, MX",
+                    "${contact?.job}",
                     style: GoogleFonts.roboto(
                       fontStyle: FontStyle.normal,
-                      fontWeight: FontWeight.w700,
-                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
                       color: const Color.fromARGB(106, 75, 75, 75),
                     ),
                   ),
@@ -426,4 +451,34 @@ class _MyWidgetState extends State<HomePage> {
       ),
     );
   }
+}
+
+class SingleDataModel {
+  String? createdDate;
+  String? name;
+  String? avatar;
+  String? phone;
+  String? streetAddress;
+  String? city;
+  String? zip;
+  String? country;
+  String? job;
+  String? email;
+  String? description;
+  String? id;
+
+  SingleDataModel({
+    this.createdDate,
+    this.name,
+    this.avatar,
+    this.phone,
+    this.streetAddress,
+    this.city,
+    this.zip,
+    this.country,
+    this.job,
+    this.email,
+    this.description,
+    this.id,
+  });
 }
