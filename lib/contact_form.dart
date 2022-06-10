@@ -23,7 +23,22 @@ class _MyWidgetState extends State<ContactForm> {
         ),
         child: Column(
           children: [
-            singleLineTextField(context: context, lblText1: "Name"),
+            Stack(
+              alignment: Alignment.topRight,
+              children: [
+                singleLineTextField(context: context, lblText1: "Name"),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const FaIcon(
+                    FontAwesomeIcons.xmark,
+                    color: Color.fromARGB(220, 226, 226, 226),
+                    size: 30,
+                  ),
+                )
+              ],
+            ),
             singleLineTextField(context: context, lblText1: "Position"),
             singleLineTextField(context: context, lblText1: "Location"),
             editDescription(context: context),

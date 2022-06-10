@@ -21,6 +21,7 @@ class _MyWidgetState extends State<HomePage> {
   Key alphKey = const Key('alpha');
   Key recentKey = const Key('recent');
   late Key selectedKey;
+  List<ContactModel> contactDetails = [];
 
   @override
   void initState() {
@@ -35,6 +36,11 @@ class _MyWidgetState extends State<HomePage> {
           body: FutureBuilder<List<ContactModel>?>(
             future: Service().getData(),
             builder: (context, data) {
+              contactDetails = data.data ?? [];
+              // sortListDate(contactModel: contactDetails);
+              selectedKey == alphKey
+                  ? sortList(contactModel: contactDetails)
+                  : sortListDate(contactModel: contactDetails);
               return Container(
                 height: MediaQuery.of(context).size.height,
                 width: MediaQuery.of(context).size.width,
@@ -48,7 +54,7 @@ class _MyWidgetState extends State<HomePage> {
                     // cardDesign(context: context),
                     Expanded(
                       child: ListView.builder(
-                        itemCount: data.data?.length ?? 0,
+                        itemCount: contactDetails.length,
                         itemBuilder: (BuildContext context, int index) {
                           return cardDesign(
                               context: context,
@@ -58,7 +64,7 @@ class _MyWidgetState extends State<HomePage> {
                               // position: data.data?[index].job ?? "",
                               // city: data.data?[index].city ?? "",
                               // country: data.data?[index].country ?? "",
-                              contact: data.data?[index]);
+                              contact: contactDetails[index]);
                         },
                       ),
                     )
@@ -450,6 +456,16 @@ class _MyWidgetState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  void sortList({required List<ContactModel> contactModel}) {
+    contactModel.sort(((a, b) => a.name!.compareTo(b.name ?? '')));
+    // debugPrint(contactModel[1].name);
+  }
+
+  void sortListDate({required List<ContactModel> contactModel}) {
+    contactModel
+        .sort(((a, b) => a.createdDate!.compareTo(b.createdDate ?? '')));
   }
 }
 

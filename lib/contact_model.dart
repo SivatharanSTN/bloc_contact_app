@@ -10,6 +10,8 @@ class ContactModel {
   String? job;
   String? email;
   String? description;
+  String? homeNumber;
+  String? socialId;
   String? id;
 
   ContactModel({
@@ -24,6 +26,8 @@ class ContactModel {
     this.job,
     this.email,
     this.description,
+    this.homeNumber,
+    this.socialId,
     this.id,
   });
   factory ContactModel.fromJson(Map<String, dynamic> json) {
@@ -39,6 +43,8 @@ class ContactModel {
       job: json["job"] ?? "",
       email: json["email"] ?? "",
       description: json["description"] ?? "",
+      homeNumber: json["home_number"] ?? "",
+      socialId: json["social_id"] ?? "",
       id: json["id"] ?? "",
     );
   }

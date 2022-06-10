@@ -14,7 +14,7 @@ class ContactDetail extends StatefulWidget {
 }
 
 class _MyWidgetState extends State<ContactDetail> {
-  @override
+  // @override
   // void initState() {
   //   super.initState();
   //   Service().getData();
@@ -30,22 +30,20 @@ class _MyWidgetState extends State<ContactDetail> {
         decoration: const BoxDecoration(
           color: Color(0xffFFFFFF),
         ),
-        child: Expanded(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              headerPart(context: context),
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 4),
-                child: const Divider(
-                  color: Color.fromARGB(88, 0, 0, 0),
-                ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            headerPart(context: context),
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 4),
+              child: const Divider(
+                color: Color.fromARGB(88, 0, 0, 0),
               ),
-              descriptionArea(context: context),
-              contactDetailArea(context: context),
-              btnArea(context: context)
-            ],
-          ),
+            ),
+            descriptionArea(context: context),
+            contactDetailArea(context: context),
+            btnArea(context: context)
+          ],
         ),
       ),
     );
@@ -200,13 +198,18 @@ class _MyWidgetState extends State<ContactDetail> {
               img: "phone",
               content: widget.contact?.phone ?? ""),
           cardDesign(
-              context: context, img: "home", content: "+1 (555) 555-1234"),
+              context: context,
+              img: "home",
+              content: widget.contact?.homeNumber ?? ""),
           cardDesign(
               context: context,
               img: "mail",
               content: widget.contact?.email ?? ""),
           cardDesign(
-              context: context, img: "instagram", content: "@alexmonterrey"),
+            context: context,
+            img: "instagram",
+            content: "@ ${widget.contact?.socialId}",
+          ),
         ],
       ),
     );
@@ -220,27 +223,23 @@ class _MyWidgetState extends State<ContactDetail> {
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 5),
         padding: const EdgeInsets.all(5),
-        height: 60,
         width: MediaQuery.of(context).size.width,
         decoration: const BoxDecoration(
           color: Color(0xffFFFFFF),
         ),
         child: Row(
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(40),
-              child: Container(
-                height: 40,
-                width: 40,
-                decoration: const BoxDecoration(
-                  color: Color(0xffF5F9FC),
-                ),
-                child: Center(
-                  child: SvgPicture.asset(
-                    "assets/svg/$img.svg",
-                    height: 20,
-                    color: const Color(0xff4287F6),
-                  ),
+            Container(
+              height: 40,
+              width: 40,
+              decoration: BoxDecoration(
+                  color: const Color(0xffF5F9FC),
+                  borderRadius: BorderRadius.circular(40)),
+              child: Center(
+                child: SvgPicture.asset(
+                  "assets/svg/$img.svg",
+                  height: 20,
+                  color: const Color(0xff4287F6),
                 ),
               ),
             ),
@@ -251,6 +250,7 @@ class _MyWidgetState extends State<ContactDetail> {
               child: Text(
                 content,
                 overflow: TextOverflow.ellipsis,
+                maxLines: 2,
                 style: GoogleFonts.openSans(
                   fontStyle: FontStyle.normal,
                   fontWeight: FontWeight.bold,
@@ -271,6 +271,7 @@ class _MyWidgetState extends State<ContactDetail> {
       child: Container(
         alignment: Alignment.center,
         margin: const EdgeInsets.only(top: 50),
+        padding: const EdgeInsets.only(left: 30, right: 30),
         height: 55,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
@@ -284,13 +285,16 @@ class _MyWidgetState extends State<ContactDetail> {
             ),
           ],
         ),
-        child: Text(
-          "Contact Alex",
-          style: GoogleFonts.openSans(
-            fontStyle: FontStyle.normal,
-            fontWeight: FontWeight.bold,
-            fontSize: 22,
-            color: const Color.fromARGB(224, 255, 255, 255),
+        child: Expanded(
+          child: Text(
+            "Contact ${widget.contact?.name}",
+            overflow: TextOverflow.ellipsis,
+            style: GoogleFonts.openSans(
+              fontStyle: FontStyle.normal,
+              fontWeight: FontWeight.bold,
+              fontSize: 22,
+              color: const Color.fromARGB(224, 255, 255, 255),
+            ),
           ),
         ),
       ),
