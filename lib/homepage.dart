@@ -4,6 +4,7 @@ import 'package:contactapp/contact_form.dart';
 import 'package:contactapp/contact_model.dart';
 import 'package:contactapp/service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -56,15 +57,71 @@ class _MyWidgetState extends State<HomePage> {
                       child: ListView.builder(
                         itemCount: contactDetails.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return cardDesign(
-                              context: context,
-                              indexNum: index,
-                              // name: data.data?[index].name ?? "",
-                              // avatar: data.data?[index].avatar ?? "",
-                              // position: data.data?[index].job ?? "",
-                              // city: data.data?[index].city ?? "",
-                              // country: data.data?[index].country ?? "",
-                              contact: contactDetails[index]);
+                          return Slidable(
+                            key: ValueKey(index),
+                            startActionPane: ActionPane(
+                              motion: const ScrollMotion(),
+                              children: [
+                                SlidableAction(
+                                  label: "Delete Contact",
+                                  backgroundColor: Colors.red,
+                                  icon: Icons.delete,
+                                  onPressed: (context) {
+                                    Service().deleteContact(
+                                        contactDetails[index].id.toString());
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(const SnackBar(
+                                      content:
+                                          Text("Contact Deleted Successfully"),
+                                    ));
+                                    setState(() {
+                                      contactDetails.removeAt(index);
+                                    });
+                                  },
+                                ),
+                                SlidableAction(
+                                  label: "Update Contact",
+                                  backgroundColor:
+                                      const Color.fromARGB(255, 54, 152, 244),
+                                  icon: Icons.update,
+                                  onPressed: (context) {
+                                    // Service().deleteContact(
+                                    //     contactDetails[index].id.toString());
+                                    // ScaffoldMessenger.of(context)
+                                    //     .showSnackBar(const SnackBar(
+                                    //   content:
+                                    //       Text("Contact Deleted Successfully"),
+                                    // ));
+                                    showModalBottomSheet(
+                                      isScrollControlled: true,
+                                      context: context,
+                                      builder: (context) => ContactForm(
+                                        name: contactDetails[index].name,
+                                        // position: contactDetails[index].job,
+                                        // location: contactDetails[index].city,
+                                        // description:
+                                        //     contactDetails[index].description,
+                                        // phone: contactDetails[index].phone,
+                                        // homeNumber: contactDetails[index].email,
+                                        // socilaId:
+                                        //     contactDetails[index].socialId,
+                                      ),
+                                    );
+                                    setState(() {});
+                                  },
+                                )
+                              ],
+                            ),
+                            child: cardDesign(
+                                context: context,
+                                indexNum: index,
+                                // name: data.data?[index].name ?? "",
+                                // avatar: data.data?[index].avatar ?? "",
+                                // position: data.data?[index].job ?? "",
+                                // city: data.data?[index].city ?? "",
+                                // country: data.data?[index].country ?? "",
+                                contact: contactDetails[index]),
+                          );
                         },
                       ),
                     )
@@ -95,7 +152,7 @@ class _MyWidgetState extends State<HomePage> {
                       showModalBottomSheet(
                         isScrollControlled: true,
                         context: context,
-                        builder: (context) => const ContactForm(),
+                        builder: (context) => ContactForm(),
                       );
                     },
                     child: const Icon(Icons.add),
@@ -465,7 +522,7 @@ class _MyWidgetState extends State<HomePage> {
 
   void sortListDate({required List<ContactModel> contactModel}) {
     contactModel
-        .sort(((a, b) => a.createdDate!.compareTo(b.createdDate ?? '')));
+        .sort(((a, b) => b.createdDate!.compareTo(a.createdDate ?? '')));
   }
 }
 

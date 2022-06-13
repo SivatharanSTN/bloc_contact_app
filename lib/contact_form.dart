@@ -1,16 +1,30 @@
+import 'package:contactapp/contact_model.dart';
+import 'package:contactapp/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+// ignore: must_be_immutable
 class ContactForm extends StatefulWidget {
-  const ContactForm({Key? key}) : super(key: key);
+  String? name;
+  ContactForm({Key? key, this.name}) : super(key: key);
 
   @override
   State<ContactForm> createState() => _MyWidgetState();
 }
 
 class _MyWidgetState extends State<ContactForm> {
+  final TextEditingController _name = TextEditingController();
+  final TextEditingController _position = TextEditingController();
+  final TextEditingController _location = TextEditingController();
+  final TextEditingController _description = TextEditingController();
+  final TextEditingController _phone = TextEditingController();
+  final TextEditingController _homeNumber = TextEditingController();
+  final TextEditingController _mail = TextEditingController();
+  final TextEditingController _socialId = TextEditingController();
+  Future<ContactModel>? _futureContact;
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -21,38 +35,79 @@ class _MyWidgetState extends State<ContactForm> {
         decoration: const BoxDecoration(
           color: Color(0xff4287F6),
         ),
-        child: Column(
-          children: [
-            Stack(
-              alignment: Alignment.topRight,
-              children: [
-                singleLineTextField(context: context, lblText1: "Name"),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const FaIcon(
-                    FontAwesomeIcons.xmark,
-                    color: Color.fromARGB(220, 226, 226, 226),
-                    size: 30,
-                  ),
-                )
-              ],
-            ),
-            singleLineTextField(context: context, lblText1: "Position"),
-            singleLineTextField(context: context, lblText1: "Location"),
-            editDescription(context: context),
-            allCardArea(context: context),
-            buttonComponent(context: context),
-          ],
-        ),
+        child: (_futureContact == null) ? buildColumn() : buildFutureBuilder(),
       ),
     );
   }
 
+  Widget buildColumn() {
+    return Column(
+      children: [
+        Stack(
+          alignment: Alignment.topRight,
+          children: [
+            singleLineTextField(
+                context: context, lblText1: "Name", controllerName: _name),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const FaIcon(
+                FontAwesomeIcons.xmark,
+                color: Color.fromARGB(220, 226, 226, 226),
+                size: 30,
+              ),
+            )
+          ],
+        ),
+        singleLineTextField(
+            context: context, lblText1: "Position", controllerName: _position),
+        singleLineTextField(
+            context: context, lblText1: "Location", controllerName: _location),
+        editDescription(context: context, controllerName: _description),
+        allCardArea(
+            context: context,
+            controllerName1: [_phone, _homeNumber, _mail, _socialId]),
+        buttonComponent(context: context),
+      ],
+    );
+  }
+
+  FutureBuilder<ContactModel> buildFutureBuilder() {
+    return FutureBuilder<ContactModel>(
+      future: _futureContact,
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          Navigator.pop(context);
+        } else if (snapshot.hasError) {
+          return Text('${snapshot.error}');
+        }
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Center(
+              child: SizedBox(
+                height: 100,
+                width: 100,
+                child: CircularProgressIndicator(
+                  color: Color(0xffFFFFFF),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget singleLineTextField(
-      {required BuildContext context, required String lblText1}) {
+      {required BuildContext context,
+      required String lblText1,
+      required controllerName}) {
     return TextField(
+      controller: controllerName,
       maxLines: 1,
       style: GoogleFonts.roboto(
         fontStyle: FontStyle.normal,
@@ -80,7 +135,8 @@ class _MyWidgetState extends State<ContactForm> {
     );
   }
 
-  Widget editDescription({required BuildContext context}) {
+  Widget editDescription(
+      {required BuildContext context, required controllerName}) {
     return Container(
       height: 140,
       width: MediaQuery.of(context).size.width,
@@ -115,6 +171,7 @@ class _MyWidgetState extends State<ContactForm> {
             ),
           ),
           TextField(
+            controller: controllerName,
             keyboardType: TextInputType.multiline,
             maxLines: 4,
             textAlign: TextAlign.justify,
@@ -143,7 +200,20 @@ class _MyWidgetState extends State<ContactForm> {
 
   Widget buttonComponent({required BuildContext context}) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        setState(() {
+          _futureContact = Service().createContact(
+            name: _name.text,
+            position: _position.text,
+            city: _location.text,
+            description: _description.text,
+            phone: _phone.text,
+            homeNumber: _homeNumber.text,
+            email: _mail.text,
+            socialId: _socialId.text,
+          );
+        });
+      },
       child: Container(
         alignment: Alignment.center,
         margin: const EdgeInsets.only(top: 20),
@@ -173,28 +243,37 @@ class _MyWidgetState extends State<ContactForm> {
     );
   }
 
-  Widget allCardArea({required BuildContext context}) {
+  Widget allCardArea(
+      {required BuildContext context, required controllerName1}) {
     return SizedBox(
       height: 230,
       width: MediaQuery.of(context).size.width,
       child: Column(
         children: [
           individualCard(
-              context: context,
-              icon: "phone",
-              hintForInput: "+52 55 1234 5678"),
+            context: context,
+            icon: "phone",
+            hintForInput: "+52 55 1234 5678",
+            controllerName: controllerName1[0],
+          ),
           individualCard(
-              context: context,
-              icon: "home",
-              hintForInput: "+1 (555) 555-1234"),
+            context: context,
+            icon: "home",
+            hintForInput: "+1 (555) 555-1234",
+            controllerName: controllerName1[1],
+          ),
           individualCard(
-              context: context,
-              icon: "mail",
-              hintForInput: "alexsmith@gmail.com"),
+            context: context,
+            icon: "mail",
+            hintForInput: "alexsmith@gmail.com",
+            controllerName: controllerName1[2],
+          ),
           individualCard(
-              context: context,
-              icon: "instagram",
-              hintForInput: "@alexmonterrey"),
+            context: context,
+            icon: "instagram",
+            hintForInput: "@alexmonterrey",
+            controllerName: controllerName1[3],
+          ),
         ],
       ),
     );
@@ -203,7 +282,8 @@ class _MyWidgetState extends State<ContactForm> {
   Widget individualCard(
       {required BuildContext context,
       required String icon,
-      required String hintForInput}) {
+      required String hintForInput,
+      required TextEditingController controllerName}) {
     return Container(
       height: 55,
       margin: const EdgeInsets.only(bottom: 2),
@@ -232,6 +312,7 @@ class _MyWidgetState extends State<ContactForm> {
             width: 250,
             margin: const EdgeInsets.only(left: 25),
             child: TextField(
+              controller: controllerName,
               style: GoogleFonts.roboto(
                 fontStyle: FontStyle.normal,
                 fontWeight: FontWeight.w500,
