@@ -75,14 +75,20 @@ class _MyWidgetState extends State<ContactForm> {
     // _position.text = widget.name!;
 
     return SafeArea(
-      child: Container(
-        padding: const EdgeInsets.all(30),
-        height: MediaQuery.of(context).size.height - 24,
-        width: MediaQuery.of(context).size.width,
-        decoration: const BoxDecoration(
-          color: Color(0xff4287F6),
+      child: SingleChildScrollView(
+        reverse: true,
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+        child: Container(
+          padding: const EdgeInsets.all(30),
+          height: MediaQuery.of(context).size.height - 24,
+          width: MediaQuery.of(context).size.width,
+          decoration: const BoxDecoration(
+            color: Color(0xff4287F6),
+          ),
+          child:
+              (_futureContact == null) ? buildColumn() : buildFutureBuilder(),
         ),
-        child: (_futureContact == null) ? buildColumn() : buildFutureBuilder(),
       ),
     );
   }
