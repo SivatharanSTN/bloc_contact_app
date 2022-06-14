@@ -63,24 +63,104 @@ class _MyWidgetState extends State<HomePage> {
                               motion: const ScrollMotion(),
                               children: [
                                 SlidableAction(
-                                  label: "Delete Contact",
                                   backgroundColor: Colors.red,
                                   icon: Icons.delete,
-                                  onPressed: (context) {
-                                    Service().deleteContact(
+                                  onPressed: (_) async {
+                                    int stCode = await Service().deleteContact(
                                         contactDetails[index].id.toString());
-                                    ScaffoldMessenger.of(context)
-                                        .showSnackBar(const SnackBar(
-                                      content:
-                                          Text("Contact Deleted Successfully"),
-                                    ));
-                                    setState(() {
-                                      contactDetails.removeAt(index);
-                                    });
+                                    if (stCode == 200) {
+                                      showDialog(
+                                          context: context,
+                                          builder: (ctx) => AlertDialog(
+                                                title: const Center(
+                                                  child: Text(
+                                                    "Success",
+                                                    style: TextStyle(
+                                                      fontSize: 24,
+                                                    ),
+                                                  ),
+                                                ),
+                                                content: const SizedBox(
+                                                  height: 24,
+                                                  width: 400,
+                                                  child: Center(
+                                                    child: Text(
+                                                      "Contact Deleted Successfully",
+                                                      style: TextStyle(
+                                                        fontSize: 20,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                actions: [
+                                                  Center(
+                                                    child: Container(
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                              bottom: 20),
+                                                      height: 40,
+                                                      width: 100,
+                                                      child: ElevatedButton(
+                                                        onPressed: () {
+                                                          Navigator.of(ctx)
+                                                              .pop();
+                                                        },
+                                                        child: const Text("Ok"),
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
+                                              ));
+                                      setState(() {
+                                        contactDetails.removeAt(index);
+                                      });
+                                    } else {
+                                      showDialog(
+                                          context: context,
+                                          builder: (ctx) => AlertDialog(
+                                                title: const Center(
+                                                  child: Text(
+                                                    "Failed",
+                                                    style: TextStyle(
+                                                      fontSize: 24,
+                                                    ),
+                                                  ),
+                                                ),
+                                                content: const SizedBox(
+                                                  height: 24,
+                                                  width: 400,
+                                                  child: Center(
+                                                    child: Text(
+                                                      "Contact Not",
+                                                      style: TextStyle(
+                                                        fontSize: 20,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ),
+                                                actions: [
+                                                  Center(
+                                                    child: Container(
+                                                      margin:
+                                                          const EdgeInsets.only(
+                                                              bottom: 20),
+                                                      height: 40,
+                                                      width: 100,
+                                                      child: ElevatedButton(
+                                                        onPressed: () {
+                                                          Navigator.of(ctx)
+                                                              .pop();
+                                                        },
+                                                        child: const Text("Ok"),
+                                                      ),
+                                                    ),
+                                                  )
+                                                ],
+                                              ));
+                                    }
                                   },
                                 ),
                                 SlidableAction(
-                                  label: "Update Contact",
                                   backgroundColor:
                                       const Color.fromARGB(255, 54, 152, 244),
                                   icon: Icons.update,
@@ -97,14 +177,18 @@ class _MyWidgetState extends State<HomePage> {
                                       context: context,
                                       builder: (context) => ContactForm(
                                         name: contactDetails[index].name,
-                                        // position: contactDetails[index].job,
-                                        // location: contactDetails[index].city,
-                                        // description:
-                                        //     contactDetails[index].description,
-                                        // phone: contactDetails[index].phone,
-                                        // homeNumber: contactDetails[index].email,
-                                        // socilaId:
-                                        //     contactDetails[index].socialId,
+                                        isUpdate: true,
+                                        position: contactDetails[index].job,
+                                        location: contactDetails[index].city,
+                                        description:
+                                            contactDetails[index].description,
+                                        phone: contactDetails[index].phone,
+                                        homeNumber:
+                                            contactDetails[index].homeNumber,
+                                        email: contactDetails[index].email,
+                                        socilaId:
+                                            contactDetails[index].socialId,
+                                        id: contactDetails[index].id,
                                       ),
                                     );
                                     setState(() {});
@@ -152,7 +236,9 @@ class _MyWidgetState extends State<HomePage> {
                       showModalBottomSheet(
                         isScrollControlled: true,
                         context: context,
-                        builder: (context) => ContactForm(),
+                        builder: (context) => ContactForm(
+                          isUpdate: false,
+                        ),
                       );
                     },
                     child: const Icon(Icons.add),

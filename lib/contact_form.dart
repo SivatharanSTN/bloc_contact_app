@@ -8,7 +8,28 @@ import 'package:google_fonts/google_fonts.dart';
 // ignore: must_be_immutable
 class ContactForm extends StatefulWidget {
   String? name;
-  ContactForm({Key? key, this.name}) : super(key: key);
+  String? position;
+  String? location;
+  String? description;
+  String? phone;
+  String? homeNumber;
+  String? email;
+  String? socilaId;
+  String? id;
+  bool? isUpdate;
+  ContactForm({
+    Key? key,
+    required this.isUpdate,
+    this.name,
+    this.position,
+    this.location,
+    this.description,
+    this.phone,
+    this.homeNumber,
+    this.email,
+    this.socilaId,
+    this.id,
+  }) : super(key: key);
 
   @override
   State<ContactForm> createState() => _MyWidgetState();
@@ -16,6 +37,7 @@ class ContactForm extends StatefulWidget {
 
 class _MyWidgetState extends State<ContactForm> {
   final TextEditingController _name = TextEditingController();
+  // var txt = TextEditingController();
   final TextEditingController _position = TextEditingController();
   final TextEditingController _location = TextEditingController();
   final TextEditingController _description = TextEditingController();
@@ -26,7 +48,32 @@ class _MyWidgetState extends State<ContactForm> {
   Future<ContactModel>? _futureContact;
 
   @override
+  void initState() {
+    widget.isUpdate == true ? _name.text = widget.name! : _name.text = "";
+    widget.isUpdate == true
+        ? _position.text = widget.position!
+        : _position.text = "";
+    widget.isUpdate == true
+        ? _location.text = widget.location!
+        : _location.text = "";
+    widget.isUpdate == true
+        ? _description.text = widget.description!
+        : _description.text = "";
+    widget.isUpdate == true ? _phone.text = widget.phone! : _phone.text = "";
+    widget.isUpdate == true
+        ? _homeNumber.text = widget.homeNumber!
+        : _homeNumber.text = "";
+    widget.isUpdate == true ? _mail.text = widget.email! : _mail.text = "";
+    widget.isUpdate == true
+        ? _socialId.text = widget.socilaId!
+        : _socialId.text = "";
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // _position.text = widget.name!;
+
     return SafeArea(
       child: Container(
         padding: const EdgeInsets.all(30),
@@ -45,6 +92,7 @@ class _MyWidgetState extends State<ContactForm> {
       children: [
         Stack(
           alignment: Alignment.topRight,
+          // MyController.value = TextEditingValue(text: "ANY TEXT");
           children: [
             singleLineTextField(
                 context: context, lblText1: "Name", controllerName: _name),
@@ -201,18 +249,37 @@ class _MyWidgetState extends State<ContactForm> {
   Widget buttonComponent({required BuildContext context}) {
     return InkWell(
       onTap: () {
-        setState(() {
-          _futureContact = Service().createContact(
-            name: _name.text,
-            position: _position.text,
-            city: _location.text,
-            description: _description.text,
-            phone: _phone.text,
-            homeNumber: _homeNumber.text,
-            email: _mail.text,
-            socialId: _socialId.text,
-          );
-        });
+        if (widget.isUpdate == false) {
+          setState(() {
+            _futureContact = Service().createContact(
+              name: _name.text,
+              position: _position.text,
+              city: _location.text,
+              description: _description.text,
+              phone: _phone.text,
+              homeNumber: _homeNumber.text,
+              email: _mail.text,
+              socialId: _socialId.text,
+            );
+          });
+        } else if (widget.isUpdate == true) {
+          setState(() {
+            _futureContact = Service().updateContact(
+              name: _name.text,
+              position: _position.text,
+              city: _location.text,
+              description: _description.text,
+              phone: _phone.text,
+              homeNumber: _homeNumber.text,
+              email: _mail.text,
+              socialId: _socialId.text,
+              id: widget.id.toString(),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("Contact updated Successfully"),
+            ));
+          });
+        }
       },
       child: Container(
         alignment: Alignment.center,
@@ -231,7 +298,7 @@ class _MyWidgetState extends State<ContactForm> {
           ],
         ),
         child: Text(
-          "Save Contact",
+          widget.isUpdate == false ? "Save Contact" : "Update Contact",
           style: GoogleFonts.openSans(
             fontStyle: FontStyle.normal,
             fontWeight: FontWeight.bold,

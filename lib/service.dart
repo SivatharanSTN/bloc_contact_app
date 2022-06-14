@@ -59,7 +59,7 @@ class Service {
     }
   }
 
-  Future<http.Response> deleteContact(String id) async {
+  Future<int> deleteContact(String id) async {
     final http.Response response = await http.delete(
       Uri.parse('https://629dce7c3dda090f3c0b91c0.mockapi.io/api/contacts/$id'),
       headers: <String, String>{
@@ -67,21 +67,22 @@ class Service {
       },
     );
 
-    return response;
+    return response.statusCode;
   }
 
-  Future<ContactModel> updateContact(
-      {required String name,
-      required String position,
-      required String city,
-      required String description,
-      required String phone,
-      required String homeNumber,
-      required String email,
-      required String socialId,
-      required String id}) async {
+  Future<ContactModel> updateContact({
+    required String name,
+    required String position,
+    required String city,
+    required String description,
+    required String phone,
+    required String homeNumber,
+    required String email,
+    required String socialId,
+    required String id,
+  }) async {
     final response = await http.put(
-      Uri.parse('https://629dce7c3dda090f3c0b91c0.mockapi.io/api/contacts'),
+      Uri.parse('https://629dce7c3dda090f3c0b91c0.mockapi.io/api/contacts/$id'),
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
       },
