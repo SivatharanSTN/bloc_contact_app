@@ -27,7 +27,7 @@ class Service {
     return dataList;
   }
 
-  Future<ContactModel> createContact(
+  Future<int> createContact(
       {required String name,
       required String position,
       required String city,
@@ -52,11 +52,12 @@ class Service {
         'social_id': socialId
       }),
     );
-    if (response.statusCode == 201) {
-      return ContactModel.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to create contact');
-    }
+    return response.statusCode;
+    // if (response.statusCode == 201) {
+    //   return ContactModel.fromJson(jsonDecode(response.body));
+    // } else {
+    //   throw Exception('Failed to create contact');
+    // }
   }
 
   Future<int> deleteContact(String id) async {
@@ -70,7 +71,7 @@ class Service {
     return response.statusCode;
   }
 
-  Future<ContactModel> updateContact({
+  Future<int> updateContact({
     required String name,
     required String position,
     required String city,
@@ -98,10 +99,11 @@ class Service {
         'id': id,
       }),
     );
-    if (response.statusCode == 200) {
-      return ContactModel.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to update contact');
-    }
+    return response.statusCode;
+    // if (response.statusCode == 200) {
+    //   return ContactModel.fromJson(jsonDecode(response.body));
+    // } else {
+    //   throw Exception('Failed to update contact');
+    // }
   }
 }

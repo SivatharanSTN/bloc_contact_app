@@ -1,4 +1,7 @@
+// ignore_for_file: unnecessary_null_comparison
+
 import 'package:contactapp/contact_model.dart';
+import 'package:contactapp/homepage.dart';
 import 'package:contactapp/service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -132,7 +135,9 @@ class _MyWidgetState extends State<ContactForm> {
       future: _futureContact,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          Navigator.pop(context);
+          Navigator.pop(
+            context,
+          );
         } else if (snapshot.hasError) {
           return Text('${snapshot.error}');
         }
@@ -254,23 +259,68 @@ class _MyWidgetState extends State<ContactForm> {
 
   Widget buttonComponent({required BuildContext context}) {
     return InkWell(
-      onTap: () {
+      onTap: () async {
         if (widget.isUpdate == false) {
-          setState(() {
-            _futureContact = Service().createContact(
-              name: _name.text,
-              position: _position.text,
-              city: _location.text,
-              description: _description.text,
-              phone: _phone.text,
-              homeNumber: _homeNumber.text,
-              email: _mail.text,
-              socialId: _socialId.text,
-            );
-          });
+          if (_name.text == "" ||
+              _position.text == "" ||
+              _location.text == "" ||
+              _description.text == "" ||
+              _phone.text == "" ||
+              _homeNumber.text == "" ||
+              _mail.text == "" ||
+              _socialId.text == "") {
+            alertBoxF(
+                context: context,
+                mainText: "Failed!",
+                subText: "Data cannot be empty!");
+          } else {
+            int sttdcode1 = await Service().createContact(
+                name: _name.text,
+                position: _position.text,
+                city: _location.text,
+                description: _description.text,
+                phone: _phone.text,
+                homeNumber: _homeNumber.text,
+                email: _mail.text,
+                socialId: _socialId.text);
+
+            if (sttdcode1 == 201) {
+              alertBoxS(
+                  context: context,
+                  mainText: "Sucess",
+                  subText: "New Contact Added ");
+            } else {
+              alertBoxF(
+                  context: context,
+                  mainText: "Failed",
+                  subText: "Failed To Add New Contact");
+            }
+            // _futureContact = Service().createContact(
+            //   name: _name.text,
+            //   position: _position.text,
+            //   city: _location.text,
+            //   description: _description.text,
+            //   phone: _phone.text,
+            //   homeNumber: _homeNumber.text,
+            //   email: _mail.text,
+            //   socialId: _socialId.text,
+            // );
+          }
         } else if (widget.isUpdate == true) {
-          setState(() {
-            _futureContact = Service().updateContact(
+          if (_name.text == "" ||
+              _position.text == "" ||
+              _location.text == "" ||
+              _description.text == "" ||
+              _phone.text == "" ||
+              _homeNumber.text == "" ||
+              _mail.text == "" ||
+              _socialId.text == "") {
+            alertBoxF(
+                context: context,
+                mainText: "Update Failed!",
+                subText: "Data cannot be empty!");
+          } else {
+            int sttCode = await Service().updateContact(
               name: _name.text,
               position: _position.text,
               city: _location.text,
@@ -281,11 +331,38 @@ class _MyWidgetState extends State<ContactForm> {
               socialId: _socialId.text,
               id: widget.id.toString(),
             );
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content: Text("Contact updated Successfully"),
-            ));
-          });
+            if (sttCode == 200) {
+              alertBoxS(
+                  context: context,
+                  mainText: "Sucessful",
+                  subText: "Contact Details Updated");
+            } else {
+              alertBoxF(
+                  context: context,
+                  mainText: "Failed",
+                  subText: "update Failed!");
+            }
+            // _futureContact = Service().updateContact(
+            //   name: _name.text,
+            //   position: _position.text,
+            //   city: _location.text,
+            //   description: _description.text,
+            //   phone: _phone.text,
+            //   homeNumber: _homeNumber.text,
+            //   email: _mail.text,
+            //   socialId: _socialId.text,
+            //   id: widget.id.toString(),
+            // );
+            // Fluttertoast.showToast(
+            //     msg: "Contact Updated Successfully",
+            //     toastLength: Toast.LENGTH_LONG,
+            //     timeInSecForIosWeb: 1,
+            //     backgroundColor: Colors.black,
+            //     fontSize: 18,
+            //     gravity: ToastGravity.CENTER);
+          }
         }
+        setState(() {});
       },
       child: Container(
         alignment: Alignment.center,
@@ -420,5 +497,104 @@ class _MyWidgetState extends State<ContactForm> {
         ],
       ),
     );
+  }
+
+  Future alertBoxS(
+      {required BuildContext context,
+      required String mainText,
+      required subText}) {
+    return showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: Center(
+                child: Text(
+                  mainText,
+                  style: const TextStyle(
+                    fontSize: 24,
+                  ),
+                ),
+              ),
+              content: SizedBox(
+                height: 24,
+                width: 400,
+                child: Center(
+                  child: Text(
+                    subText,
+                    style: const TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+              ),
+              actions: [
+                Center(
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    height: 40,
+                    width: 100,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(ctx).pop();
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HomePage()));
+                        // setState(() {});
+                      },
+                      child: const Text("Ok"),
+                    ),
+                  ),
+                )
+              ],
+            ));
+  }
+
+  Future alertBoxF(
+      {required BuildContext context,
+      required String mainText,
+      required subText}) {
+    return showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: Center(
+                child: Text(
+                  mainText,
+                  style: const TextStyle(
+                    fontSize: 24,
+                  ),
+                ),
+              ),
+              content: SizedBox(
+                height: 24,
+                width: 400,
+                child: Center(
+                  child: Text(
+                    subText,
+                    style: const TextStyle(
+                      fontSize: 20,
+                    ),
+                  ),
+                ),
+              ),
+              actions: [
+                Center(
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 20),
+                    height: 40,
+                    width: 100,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(ctx).pop();
+                        // Navigator.push(
+                        //     context,
+                        //     MaterialPageRoute(
+                        //         builder: (context) => HomePage()));
+                      },
+                      child: const Text("Ok"),
+                    ),
+                  ),
+                )
+              ],
+            ));
   }
 }
