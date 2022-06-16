@@ -287,7 +287,7 @@ class _MyWidgetState extends State<ContactForm> {
             if (sttdcode1 == 201) {
               alertBoxS(
                   context: context,
-                  mainText: "Sucess",
+                  mainText: "Success",
                   subText: "New Contact Added ");
             } else {
               alertBoxF(
@@ -295,16 +295,6 @@ class _MyWidgetState extends State<ContactForm> {
                   mainText: "Failed",
                   subText: "Failed To Add New Contact");
             }
-            // _futureContact = Service().createContact(
-            //   name: _name.text,
-            //   position: _position.text,
-            //   city: _location.text,
-            //   description: _description.text,
-            //   phone: _phone.text,
-            //   homeNumber: _homeNumber.text,
-            //   email: _mail.text,
-            //   socialId: _socialId.text,
-            // );
           }
         } else if (widget.isUpdate == true) {
           if (_name.text == "" ||
@@ -334,7 +324,7 @@ class _MyWidgetState extends State<ContactForm> {
             if (sttCode == 200) {
               alertBoxS(
                   context: context,
-                  mainText: "Sucessful",
+                  mainText: "Successful",
                   subText: "Contact Details Updated");
             } else {
               alertBoxF(
@@ -342,27 +332,8 @@ class _MyWidgetState extends State<ContactForm> {
                   mainText: "Failed",
                   subText: "update Failed!");
             }
-            // _futureContact = Service().updateContact(
-            //   name: _name.text,
-            //   position: _position.text,
-            //   city: _location.text,
-            //   description: _description.text,
-            //   phone: _phone.text,
-            //   homeNumber: _homeNumber.text,
-            //   email: _mail.text,
-            //   socialId: _socialId.text,
-            //   id: widget.id.toString(),
-            // );
-            // Fluttertoast.showToast(
-            //     msg: "Contact Updated Successfully",
-            //     toastLength: Toast.LENGTH_LONG,
-            //     timeInSecForIosWeb: 1,
-            //     backgroundColor: Colors.black,
-            //     fontSize: 18,
-            //     gravity: ToastGravity.CENTER);
           }
         }
-        setState(() {});
       },
       child: Container(
         alignment: Alignment.center,
