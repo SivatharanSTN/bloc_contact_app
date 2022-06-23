@@ -324,7 +324,7 @@ class _MyWidgetState extends State<ContactForm> {
             if (sttCode == 200) {
               alertBoxS(
                   context: context,
-                  mainText: "Successful",
+                  mainText: "Success",
                   subText: "Contact Details Updated");
             } else {
               alertBoxF(

@@ -1,9 +1,12 @@
+import 'package:contactapp/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'homepage.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+      MultiBlocProvider(providers: Providers.providers, child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {

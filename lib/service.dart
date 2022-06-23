@@ -6,25 +6,33 @@ import 'package:http/http.dart' as https;
 import 'package:http/http.dart' as http;
 
 class Service {
-  final String _dataUrl =
+  static const String _dataUrl =
       "https://629dce7c3dda090f3c0b91c0.mockapi.io/api/contacts";
   var client = https.Client;
 
-  Future<List<ContactModel>?> getData() async {
+  static Future<ContactListModel> getData() async {
     // https.Response? response;
-    List<ContactModel>? dataList;
+    late ContactListModel dataList;
 
     try {
       Uri url = Uri.parse(_dataUrl);
       // response = await client.;
       var res = await https.get(url);
-      var data = jsonDecode(res.body);
 
-      dataList = List.from(data.map((val) => ContactModel.fromJson(val)));
+      if (res.statusCode == 200) {
+        var data = jsonDecode(res.body);
+
+        dataList = ContactListModel.fromJson(data);
+        return dataList;
+      } else {
+        return ContactListModel(
+            errorModel: ErrorModel(isError: true, statusCode: res.statusCode));
+      }
     } catch (e) {
       debugPrint(e.toString());
     }
-    return dataList;
+    return ContactListModel(
+        errorModel: ErrorModel(isError: true, statusCode: 400));
   }
 
   Future<int> createContact(

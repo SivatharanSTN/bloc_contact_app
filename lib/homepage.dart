@@ -1,12 +1,17 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:contactapp/bloc/contact_bloc/contact_bloc.dart';
+import 'package:contactapp/bloc/contact_bloc/contact_bloc_event.dart';
 import 'package:contactapp/contact_detailpage.dart';
 import 'package:contactapp/contact_form.dart';
 import 'package:contactapp/contact_model.dart';
 import 'package:contactapp/service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import 'bloc/contact_bloc/contact_bloc_state.dart';
 
 // ignore: must_be_immutable
 class HomePage extends StatefulWidget {
@@ -28,190 +33,200 @@ class _MyWidgetState extends State<HomePage> {
   void initState() {
     selectedKey = alphKey;
     super.initState();
+    BlocProvider.of<ContactBloc>(context).add(FetchContact());
   }
 
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-          body: FutureBuilder<List<ContactModel>?>(
-            future: Service().getData(),
-            builder: (context, data) {
-              contactDetails = data.data ?? [];
-              // sortListDate(contactModel: contactDetails);
-              selectedKey == alphKey
-                  ? sortList(contactModel: contactDetails)
-                  : sortListDate(contactModel: contactDetails);
-              return Container(
-                height: MediaQuery.of(context).size.height,
-                width: MediaQuery.of(context).size.width,
-                padding: const EdgeInsets.only(top: 25, right: 25, left: 25),
-                decoration: const BoxDecoration(color: Color(0xffFFFFFF)),
-                child: Column(
-                  children: [
-                    componentOne(context: context),
-                    componentTwo(context: context),
-                    componentThree(context: context),
-                    // cardDesign(context: context),
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: contactDetails.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Slidable(
-                            key: ValueKey(index),
-                            startActionPane: ActionPane(
-                              motion: const ScrollMotion(),
-                              children: [
-                                SlidableAction(
-                                  backgroundColor: Colors.red,
-                                  icon: Icons.delete,
-                                  onPressed: (_) async {
-                                    int stCode = await Service().deleteContact(
-                                        contactDetails[index].id.toString());
-                                    if (stCode == 200) {
-                                      showDialog(
-                                          context: context,
-                                          builder: (ctx) => AlertDialog(
-                                                title: const Center(
-                                                  child: Text(
-                                                    "Success",
-                                                    style: TextStyle(
-                                                      fontSize: 24,
-                                                    ),
-                                                  ),
-                                                ),
-                                                content: const SizedBox(
-                                                  height: 24,
-                                                  width: 400,
-                                                  child: Center(
+          body: BlocConsumer<ContactBloc, ContactState>(
+            listener: (context, state) {
+              if (state is ContactLoaded) {
+                contactDetails = state.contactListModel.contactList ?? [];
+                selectedKey == alphKey
+                    ? sortList(contactModel: contactDetails)
+                    : sortListDate(contactModel: contactDetails);
+              }
+            },
+            builder: (context, state) {
+              // return Container();
+              if (state is ContactLoaded) {
+                return Container(
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                  padding: const EdgeInsets.only(top: 25, right: 25, left: 25),
+                  decoration: const BoxDecoration(color: Color(0xffFFFFFF)),
+                  child: Column(
+                    children: [
+                      componentOne(context: context),
+                      componentTwo(context: context),
+                      componentThree(context: context),
+                      // cardDesign(context: context),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: contactDetails.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Slidable(
+                              key: ValueKey(index),
+                              startActionPane: ActionPane(
+                                motion: const ScrollMotion(),
+                                children: [
+                                  SlidableAction(
+                                    backgroundColor: Colors.red,
+                                    icon: Icons.delete,
+                                    onPressed: (_) async {
+                                      int stCode = await Service()
+                                          .deleteContact(contactDetails[index]
+                                              .id
+                                              .toString());
+                                      if (stCode == 200) {
+                                        showDialog(
+                                            context: context,
+                                            builder: (ctx) => AlertDialog(
+                                                  title: const Center(
                                                     child: Text(
-                                                      "Contact Deleted Successfully",
+                                                      "Success",
                                                       style: TextStyle(
-                                                        fontSize: 20,
+                                                        fontSize: 24,
                                                       ),
                                                     ),
                                                   ),
-                                                ),
-                                                actions: [
-                                                  Center(
-                                                    child: Container(
-                                                      margin:
-                                                          const EdgeInsets.only(
-                                                              bottom: 20),
-                                                      height: 40,
-                                                      width: 100,
-                                                      child: ElevatedButton(
-                                                        onPressed: () {
-                                                          Navigator.of(ctx)
-                                                              .pop();
-                                                        },
-                                                        child: const Text("Ok"),
+                                                  content: const SizedBox(
+                                                    height: 24,
+                                                    width: 400,
+                                                    child: Center(
+                                                      child: Text(
+                                                        "Contact Deleted Successfully",
+                                                        style: TextStyle(
+                                                          fontSize: 20,
+                                                        ),
                                                       ),
                                                     ),
-                                                  )
-                                                ],
-                                              ));
-                                      setState(() {
-                                        contactDetails.removeAt(index);
-                                      });
-                                    } else {
-                                      showDialog(
-                                          context: context,
-                                          builder: (ctx) => AlertDialog(
-                                                title: const Center(
-                                                  child: Text(
-                                                    "Failed",
-                                                    style: TextStyle(
-                                                      fontSize: 24,
-                                                    ),
                                                   ),
-                                                ),
-                                                content: const SizedBox(
-                                                  height: 24,
-                                                  width: 400,
-                                                  child: Center(
+                                                  actions: [
+                                                    Center(
+                                                      child: Container(
+                                                        margin: const EdgeInsets
+                                                            .only(bottom: 20),
+                                                        height: 40,
+                                                        width: 100,
+                                                        child: ElevatedButton(
+                                                          onPressed: () {
+                                                            Navigator.of(ctx)
+                                                                .pop();
+                                                          },
+                                                          child:
+                                                              const Text("Ok"),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ));
+                                        setState(() {
+                                          contactDetails.removeAt(index);
+                                        });
+                                      } else {
+                                        showDialog(
+                                            context: context,
+                                            builder: (ctx) => AlertDialog(
+                                                  title: const Center(
                                                     child: Text(
-                                                      "Contact Not",
+                                                      "Failed",
                                                       style: TextStyle(
-                                                        fontSize: 20,
+                                                        fontSize: 24,
                                                       ),
                                                     ),
                                                   ),
-                                                ),
-                                                actions: [
-                                                  Center(
-                                                    child: Container(
-                                                      margin:
-                                                          const EdgeInsets.only(
-                                                              bottom: 20),
-                                                      height: 40,
-                                                      width: 100,
-                                                      child: ElevatedButton(
-                                                        onPressed: () {
-                                                          Navigator.of(ctx)
-                                                              .pop();
-                                                        },
-                                                        child: const Text("Ok"),
+                                                  content: const SizedBox(
+                                                    height: 24,
+                                                    width: 400,
+                                                    child: Center(
+                                                      child: Text(
+                                                        "Contact Not",
+                                                        style: TextStyle(
+                                                          fontSize: 20,
+                                                        ),
                                                       ),
                                                     ),
-                                                  )
-                                                ],
-                                              ));
-                                    }
-                                  },
-                                ),
-                                SlidableAction(
-                                  backgroundColor:
-                                      const Color.fromARGB(255, 54, 152, 244),
-                                  icon: Icons.update,
-                                  onPressed: (context) {
-                                    // Service().deleteContact(
-                                    //     contactDetails[index].id.toString());
-                                    // ScaffoldMessenger.of(context)
-                                    //     .showSnackBar(const SnackBar(
-                                    //   content:
-                                    //       Text("Contact Deleted Successfully"),
-                                    // ));
-                                    showModalBottomSheet(
-                                      isScrollControlled: true,
-                                      context: context,
-                                      builder: (context) => ContactForm(
-                                        name: contactDetails[index].name,
-                                        isUpdate: true,
-                                        position: contactDetails[index].job,
-                                        location: contactDetails[index].city,
-                                        description:
-                                            contactDetails[index].description,
-                                        phone: contactDetails[index].phone,
-                                        homeNumber:
-                                            contactDetails[index].homeNumber,
-                                        email: contactDetails[index].email,
-                                        socilaId:
-                                            contactDetails[index].socialId,
-                                        id: contactDetails[index].id,
-                                      ),
-                                    );
-                                    setState(() {});
-                                  },
-                                )
-                              ],
-                            ),
-                            child: cardDesign(
-                                context: context,
-                                indexNum: index,
-                                // name: data.data?[index].name ?? "",
-                                // avatar: data.data?[index].avatar ?? "",
-                                // position: data.data?[index].job ?? "",
-                                // city: data.data?[index].city ?? "",
-                                // country: data.data?[index].country ?? "",
-                                contact: contactDetails[index]),
-                          );
-                        },
-                      ),
-                    )
-                  ],
-                ),
-              );
+                                                  ),
+                                                  actions: [
+                                                    Center(
+                                                      child: Container(
+                                                        margin: const EdgeInsets
+                                                            .only(bottom: 20),
+                                                        height: 40,
+                                                        width: 100,
+                                                        child: ElevatedButton(
+                                                          onPressed: () {
+                                                            Navigator.of(ctx)
+                                                                .pop();
+                                                          },
+                                                          child:
+                                                              const Text("Ok"),
+                                                        ),
+                                                      ),
+                                                    )
+                                                  ],
+                                                ));
+                                      }
+                                    },
+                                  ),
+                                  SlidableAction(
+                                    backgroundColor:
+                                        const Color.fromARGB(255, 54, 152, 244),
+                                    icon: Icons.update,
+                                    onPressed: (context) {
+                                      // Service().deleteContact(
+                                      //     contactDetails[index].id.toString());
+                                      // ScaffoldMessenger.of(context)
+                                      //     .showSnackBar(const SnackBar(
+                                      //   content:
+                                      //       Text("Contact Deleted Successfully"),
+                                      // ));
+                                      showModalBottomSheet(
+                                        isScrollControlled: true,
+                                        context: context,
+                                        builder: (context) => ContactForm(
+                                          name: contactDetails[index].name,
+                                          isUpdate: true,
+                                          position: contactDetails[index].job,
+                                          location: contactDetails[index].city,
+                                          description:
+                                              contactDetails[index].description,
+                                          phone: contactDetails[index].phone,
+                                          homeNumber:
+                                              contactDetails[index].homeNumber,
+                                          email: contactDetails[index].email,
+                                          socilaId:
+                                              contactDetails[index].socialId,
+                                          id: contactDetails[index].id,
+                                        ),
+                                      );
+                                      setState(() {});
+                                    },
+                                  )
+                                ],
+                              ),
+                              child: cardDesign(
+                                  context: context,
+                                  indexNum: index,
+                                  // name: data.data?[index].name ?? "",
+                                  // avatar: data.data?[index].avatar ?? "",
+                                  // position: data.data?[index].job ?? "",
+                                  // city: data.data?[index].city ?? "",
+                                  // country: data.data?[index].country ?? "",
+                                  contact: contactDetails[index]),
+                            );
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                );
+              } else {
+                return Container();
+              }
             },
           ),
 

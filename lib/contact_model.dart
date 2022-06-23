@@ -49,3 +49,27 @@ class ContactModel {
     );
   }
 }
+
+class ContactListModel {
+  List<ContactModel>? contactList;
+  ErrorModel errorModel;
+
+  ContactListModel({
+    required this.errorModel,
+    this.contactList,
+  });
+
+  factory ContactListModel.fromJson(dynamic json) {
+    return ContactListModel(
+        errorModel: ErrorModel(statusCode: 200),
+        contactList:
+            List<ContactModel>.from(json.map((x) => ContactModel.fromJson(x))));
+  }
+}
+
+class ErrorModel {
+  int statusCode;
+  bool isError;
+
+  ErrorModel({required this.statusCode, this.isError = false});
+}
